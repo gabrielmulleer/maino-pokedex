@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
+import HelloWorld from "./components/HelloWorld.vue";
 </script>
 
 <template>
@@ -12,6 +12,11 @@ import HelloWorld from './components/HelloWorld.vue'
     </a>
   </div>
   <HelloWorld msg="Vite + Vue" />
+
+  <div class="container py-4 px-3 mx-auto">
+    <h1>Hello, Bootstrap and Vite!</h1>
+    <button class="btn btn-primary">Primary button</button>
+  </div>
 </template>
 
 <style scoped>
