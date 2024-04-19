@@ -2,6 +2,7 @@
 import HelloWorld from "./components/HelloWorld.vue";
 import { useStore } from "vuex";
 import { onMounted, ref } from "vue";
+import CardComponent from "./components/globalComponents/Card/CardComponent.vue";
 
 const store = useStore();
 const isLoading = ref(false);
@@ -25,11 +26,11 @@ onMounted(fetchPokemons);
   <div>
     <div v-if="isLoading">Carregando...</div>
     <div v-else>
-      <ul>
-        <li v-for="pokemon in pokemons.results" :key="pokemon.name">
-          {{ pokemon.name }}
-        </li>
-      </ul>
+      <CardComponent
+        v-for="pokemon in pokemons.results"
+        :key="pokemon.name"
+        :name="pokemon.name"
+      />
     </div>
   </div>
 </template>
