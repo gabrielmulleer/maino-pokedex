@@ -1,21 +1,36 @@
 <script setup lang="ts">
 import HelloWorld from "./components/HelloWorld.vue";
+import { useStore } from "vuex";
+import { onMounted, ref } from "vue";
+
+const store = useStore();
+const isLoading = ref(false);
+const pokemons = ref([]);
+
+const fetchPokemons = async () => {
+  isLoading.value = true;
+  try {
+    await store.dispatch("getPokemons");
+    pokemons.value = store.state.pokemons;
+  } catch (error) {
+    console.error("Erro ao buscar pokemons:", error);
+  } finally {
+    isLoading.value = false;
+  }
+};
+onMounted(fetchPokemons);
 </script>
 
 <template>
   <div>
-    <a href="https://vitejs.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
-  </div>
-  <HelloWorld msg="Vite + Vue" />
-
-  <div class="container py-4 px-3 mx-auto">
-    <h1>Hello, Bootstrap and Vite!</h1>
-    <button class="btn btn-primary">Primary button</button>
+    <div v-if="isLoading">Carregando...</div>
+    <div v-else>
+      <ul>
+        <li v-for="pokemon in pokemons.results" :key="pokemon.name">
+          {{ pokemon.name }}
+        </li>
+      </ul>
+    </div>
   </div>
 </template>
 
