@@ -1,10 +1,12 @@
-<script setup lang="ts"></script>
+<script setup lang="ts">
+const modalProp = defineProps(["id", "label"]);
+</script>
 <template>
   <div
     class="modal fade"
-    id="exampleModal"
+    :id="id"
     tabindex="-1"
-    aria-labelledby="exampleModalLabel"
+    :aria-labelledby="label"
     aria-hidden="true"
   >
     <div class="modal-dialog modal-dialog-centered">
