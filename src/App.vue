@@ -7,6 +7,9 @@ import CardComponent from "./components/globalComponents/Card/CardComponent.vue"
 const store = useStore();
 const isLoading = ref(false);
 const pokemons = ref([]);
+const urlSvg = ref(
+  "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/"
+);
 
 const fetchPokemons = async () => {
   isLoading.value = true;
@@ -19,17 +22,20 @@ const fetchPokemons = async () => {
     isLoading.value = false;
   }
 };
+
 onMounted(fetchPokemons);
 </script>
 
 <template>
   <div>
     <div v-if="isLoading">Carregando...</div>
-    <div v-else>
+
+    <div v-else class="row">
       <CardComponent
         v-for="pokemon in pokemons.results"
         :key="pokemon.name"
         :name="pokemon.name"
+        :urlSvg="urlSvg + pokemon.url.split('/')[6] + '.svg'"
       />
     </div>
   </div>
