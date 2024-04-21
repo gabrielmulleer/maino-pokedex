@@ -1,37 +1,31 @@
-<script setup lang="ts">
-const modalProp = defineProps(["id", "label"]);
+<script lang="ts">
+import { defineComponent, SetupContext } from "vue";
+import { PokemonDetails } from "../../../types/pokedex";
+export default defineComponent({
+  setup(props, { emit }: SetupContext) {
+    const close = () => {
+      emit("close");
+    };
+    return { close };
+  },
+  props: {
+    activeCard: { type: Object as () => PokemonDetails, required: true },
+    modalActive: { type: Boolean, required: true },
+  },
+});
 </script>
 <template>
-  <div
-    class="modal fade"
-    :id="id"
-    tabindex="-1"
-    :aria-labelledby="label"
-    aria-hidden="true"
-  >
+  <div v-show="modalActive" class="modal fade show" style="display: block">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
         <div class="modal-header">
-          <h1 class="modal-title fs-5" id="exampleModalLabel">Modal title</h1>
-          <button
-            type="button"
-            class="btn-close"
-            data-bs-dismiss="modal"
-            aria-label="Close"
-          ></button>
+          <button type="button" class="btn-close" @click="close"></button>
         </div>
         <div class="modal-body">
           <slot></slot>
         </div>
         <div class="modal-footer">
-          <button
-            type="button"
-            class="btn btn-secondary"
-            data-bs-dismiss="modal"
-          >
-            Close
-          </button>
-          <button type="button" class="btn btn-primary">Save changes</button>
+          <button type="button" @click="close">Close</button>
         </div>
       </div>
     </div>
