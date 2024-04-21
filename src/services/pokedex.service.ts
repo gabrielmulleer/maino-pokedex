@@ -66,8 +66,6 @@ class PokedexService extends ServicesAPI {
 
   collectSpeciesNames(evolutionData: PokemonEvolution) {
     let names: string[] = [];
-    // console.log(evolutionData.species);
-    // console.log(names);
     function traverse(evolution: PokemonEvolution) {
       if (evolution.species && evolution.species.name) {
         names.push(evolution.species.name);
