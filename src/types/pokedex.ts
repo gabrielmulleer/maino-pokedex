@@ -1,6 +1,7 @@
 export interface State {
   pokemons?: Pokemons;
   visited_pokemons: PokemonDetails[];
+  pokemons_list: PokemonsResult[];
   active_card?: PokemonDetails;
 }
 export interface Pokemons {

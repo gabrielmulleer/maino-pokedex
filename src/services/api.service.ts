@@ -4,7 +4,10 @@ export default class ServicesAPI {
   baseURL = "https://pokeapi.co/api/v2/";
   timeout = 10000;
 
-  async get(url: string): Promise<any> {
+  async get(url: string | null = null): Promise<any> {
+    if (url === null) {
+      throw new Error("URL não pode ser nula");
+    }
     const config = {
       baseURL: this.baseURL,
       timeout: this.timeout,

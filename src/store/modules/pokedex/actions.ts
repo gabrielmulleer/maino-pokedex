@@ -1,14 +1,22 @@
-import { PokemonDetails, State } from "../../../types/pokedex";
+import {
+  PokemonDetails,
+  Pokemons,
+  PokemonsResult,
+  State,
+} from "../../../types/pokedex";
 
 export default {
-  async getPokemons({ commit }: { commit: Function }) {
-    try {
-      const res = await fetch("https://pokeapi.co/api/v2/pokemon");
-      const data = await res.json();
-      commit("SET_POKEMONS", data);
-    } catch (error) {
-      console.error("Erro ao buscar pokemons:", error);
-    }
+  addToPokemons(
+    { commit, state }: { commit: Function; state: State },
+    pokemon: Pokemons
+  ) {
+    commit("SET_POKEMONS", pokemon);
+  },
+  addToPokemonsList(
+    { commit, state }: { commit: Function; state: State },
+    pokemon: PokemonsResult
+  ) {
+    commit("ADD_POKEMONS_LIST", pokemon);
   },
   addToVisited(
     { commit, state }: { commit: Function; state: State },
@@ -21,8 +29,5 @@ export default {
     pokemon: PokemonDetails
   ) {
     commit("SET_ACTIVE_CARD", pokemon);
-  },
-  resetActiveCard({ commit, state }: { commit: Function; state: State }) {
-    commit("RESET_ACTIVE_CARD");
   },
 };

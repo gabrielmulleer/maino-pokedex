@@ -1,6 +1,12 @@
 import { Store } from "vuex/types/index.js";
 import ServicesAPI from "./api.service";
-import { PokemonDetails, PokemonEvolution, State } from "../types/pokedex";
+import {
+  PokemonDetails,
+  PokemonEvolution,
+  Pokemons,
+  PokemonsResult,
+  State,
+} from "../types/pokedex";
 
 class PokedexService extends ServicesAPI {
   private static instance: PokedexService;
@@ -24,9 +30,24 @@ class PokedexService extends ServicesAPI {
 
   static initialize(store: Store<State>) {
     PokedexService.store = store;
-    store.dispatch("pokedex/getPokemons");
+    PokedexService.getPokemons();
   }
+  static async getPokemons() {
+    try {
+      const res = await fetch("https://pokeapi.co/api/v2/pokemon");
+      const data = await res.json();
 
+      if (PokedexService.store) {
+        PokedexService.store.dispatch("pokedex/addToPokemons", data);
+        PokedexService.store.dispatch(
+          "pokedex/addToPokemonsList",
+          data.results
+        );
+      }
+    } catch (error) {
+      console.error("Erro ao buscar pokemons:", error);
+    }
+  }
   public getPokemonById = async (id: number) => {
     const pokemon = this.validateVisitedPokemon(id);
 
@@ -82,5 +103,17 @@ class PokedexService extends ServicesAPI {
 
     return names;
   }
+  getPokemonsList() {
+    return PokedexService.store.getters["pokedex/getPokemonsList"];
+  }
+  public getNextList = async (url: string | null) => {
+    const data_next = await this.get(url);
+    const next_pokemons_list = data_next.results;
+    PokedexService.store.dispatch("pokedex/addToPokemons", data_next);
+    PokedexService.store.dispatch(
+      "pokedex/addToPokemonsList",
+      next_pokemons_list
+    );
+  };
 }
 export default PokedexService;
