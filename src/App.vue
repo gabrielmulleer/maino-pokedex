@@ -5,6 +5,7 @@ import CardComponent from "./components/globalComponents/Card/CardComponent.vue"
 import { PokemonDetails, PokemonsResult } from "./types/pokedex";
 import ModalComponent from "./components/globalComponents/Modal/ModalComponent.vue";
 import PokedexService from "./services/pokedex.service";
+import Header from "./components/globalComponents/Header/Header.vue";
 
 export default defineComponent({
   setup() {
@@ -159,6 +160,7 @@ export default defineComponent({
     };
   },
   components: {
+    Header,
     CardComponent,
     ModalComponent,
   },
@@ -166,6 +168,7 @@ export default defineComponent({
 </script>
 
 <template>
+  <Header />
   <div>
     <div class="input-group mb-3">
       <button
