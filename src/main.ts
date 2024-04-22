@@ -4,7 +4,7 @@ import App from "./App.vue";
 import store from "./store";
 import PokedexService from "./services/pokedex.service";
 
-PokedexService.initialize(store);
+PokedexService.getInstance(store);
 
 const app = createApp(App);
 

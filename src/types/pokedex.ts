@@ -34,6 +34,6 @@ interface PokemonMoves {
 interface PokemonGameIndices {
   version: PokemonsResult;
 }
-interface PokemonTypes {
-  type: PokemonsResult;
+export interface PokemonTypes {
+  pokemon: PokemonsResult;
 }

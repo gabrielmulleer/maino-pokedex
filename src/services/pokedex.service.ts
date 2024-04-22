@@ -3,8 +3,7 @@ import ServicesAPI from "./api.service";
 import {
   PokemonDetails,
   PokemonEvolution,
-  Pokemons,
-  PokemonsResult,
+  PokemonTypes,
   State,
 } from "../types/pokedex";
 
@@ -22,27 +21,20 @@ class PokedexService extends ServicesAPI {
     }
     if (!PokedexService.instance && PokedexService.store) {
       PokedexService.instance = new PokedexService();
+      PokedexService.instance.getPokemons();
     } else if (!PokedexService.store) {
       throw new Error("The application requires a Vuex store");
     }
     return PokedexService.instance;
   }
 
-  static initialize(store: Store<State>) {
-    PokedexService.store = store;
-    PokedexService.getPokemons();
-  }
-  static async getPokemons() {
+  async getPokemons() {
     try {
-      const res = await fetch("https://pokeapi.co/api/v2/pokemon");
-      const data = await res.json();
+      const res = await this.get("/pokemon");
 
       if (PokedexService.store) {
-        PokedexService.store.dispatch("pokedex/addToPokemons", data);
-        PokedexService.store.dispatch(
-          "pokedex/addToPokemonsList",
-          data.results
-        );
+        PokedexService.store.dispatch("pokedex/addToPokemons", res);
+        PokedexService.store.dispatch("pokedex/addToPokemonsList", res.results);
       }
     } catch (error) {
       console.error("Erro ao buscar pokemons:", error);
@@ -115,5 +107,27 @@ class PokedexService extends ServicesAPI {
       next_pokemons_list
     );
   };
+
+  async filterByName(name: string) {
+    const nameFiltered = await this.get(`pokemon/${name}`);
+
+    return [nameFiltered];
+  }
+  async filterById(id: number) {
+    const idFiltered = await this.get(`pokemon/${id}`);
+    return [idFiltered];
+  }
+  async filterByType(type: number | string) {
+    const typeFiltered = await this.get(`type/${type}`);
+    const typeList = typeFiltered.pokemon.map((item: PokemonTypes) => ({
+      name: item.pokemon.name,
+      url: item.pokemon.url,
+    }));
+    return typeList;
+  }
+  async filterBySpecies(species: number | string) {
+    const speciesFiltered = await this.get(`pokemon-species/${species}`);
+    return [speciesFiltered];
+  }
 }
 export default PokedexService;
