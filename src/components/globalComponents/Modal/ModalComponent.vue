@@ -2,7 +2,7 @@
 import { defineComponent, SetupContext } from "vue";
 import { PokemonDetails } from "../../../types/pokedex";
 export default defineComponent({
-  setup(props, { emit }: SetupContext) {
+  setup(_props, { emit }: SetupContext) {
     const close = () => {
       emit("close");
     };

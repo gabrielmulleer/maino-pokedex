@@ -8,14 +8,12 @@
     "build": "vue-tsc && vite build",
     "preview": "vite preview"
   },
-  "dependencies": {
+  "devDependencies": {
     "@popperjs/core": "^2.11.8",
     "axios": "^1.6.8",
     "bootstrap": "^5.3.3",
     "vue": "^3.4.21",
-    "vuex": "^4.0.2"
-  },
-  "devDependencies": {
+    "vuex": "^4.0.2",
     "@vitejs/plugin-vue": "^5.0.4",
     "sass": "^1.75.0",
     "typescript": "^5.2.2",
