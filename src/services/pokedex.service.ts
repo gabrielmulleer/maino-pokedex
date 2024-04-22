@@ -3,8 +3,7 @@ import ServicesAPI from "./api.service";
 import {
   PokemonDetails,
   PokemonEvolution,
-  Pokemons,
-  PokemonsResult,
+  PokemonTypes,
   State,
 } from "../types/pokedex";
 
@@ -111,19 +110,24 @@ class PokedexService extends ServicesAPI {
 
   async filterByName(name: string) {
     const nameFiltered = await this.get(`pokemon/${name}`);
-    return nameFiltered;
+
+    return [nameFiltered];
   }
   async filterById(id: number) {
     const idFiltered = await this.get(`pokemon/${id}`);
-    return idFiltered;
+    return [idFiltered];
   }
   async filterByType(type: number | string) {
     const typeFiltered = await this.get(`type/${type}`);
-    return typeFiltered.pokemon;
+    const typeList = typeFiltered.pokemon.map((item: PokemonTypes) => ({
+      name: item.pokemon.name,
+      url: item.pokemon.url,
+    }));
+    return typeList;
   }
   async filterBySpecies(species: number | string) {
     const speciesFiltered = await this.get(`pokemon-species/${species}`);
-    return speciesFiltered;
+    return [speciesFiltered];
   }
 }
 export default PokedexService;
