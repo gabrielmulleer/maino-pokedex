@@ -1,24 +1,29 @@
 <script lang="ts">
 import { useStore } from "vuex";
-import { ref, defineComponent, computed } from "vue";
+import { ref, defineComponent, computed, onMounted, onUnmounted } from "vue";
 import CardComponent from "./components/globalComponents/Card/CardComponent.vue";
-import { PokemonDetails, PokemonsResult } from "./types/pokedex";
+import { PokemonDetails, Pokemons, PokemonsResult } from "./types/pokedex";
 import ModalComponent from "./components/globalComponents/Modal/ModalComponent.vue";
 import PokedexService from "./services/pokedex.service";
 
 export default defineComponent({
   setup() {
     const store = useStore();
+    const pokedexService = PokedexService.getInstance();
     const pokemons = computed(() => store.getters["pokedex/getAllPokemons"]);
-    const modalActive = ref<boolean>(false);
+    const pokemonsList = computed(
+      () => store.getters["pokedex/getPokemonsList"]
+    );
+    const activeCard = computed(() => store.getters["pokedex/getActiveCard"]);
     const urlSvg = ref(
       "https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/dream-world/"
     );
+
+    const modalActive = ref<boolean>(false);
     const spriteUrls = ref<string[]>([]);
     const pokemonDetails = ref<PokemonDetails | null>(null);
     const evolutionChain = ref<any>(null);
-    const pokedexService = PokedexService.getInstance();
-    const activeCard = computed(() => store.getters["pokedex/getActiveCard"]);
+    const scrollComponent = ref<any>(null);
 
     const fetchData = async ({ url }: PokemonsResult) => {
       try {
@@ -42,6 +47,13 @@ export default defineComponent({
         return;
       }
     };
+    const loadMorePokemons = async (nextUrl: string | null) => {
+      try {
+        await pokedexService.getNextList(nextUrl);
+      } catch (error) {
+        return;
+      }
+    };
 
     const modalOpen = async (url: PokemonsResult) => {
       modalActive.value = true;
@@ -50,7 +62,7 @@ export default defineComponent({
     };
     const modalClose = () => {
       modalActive.value = false;
-      store.dispatch("pokedex/resetActiveCard");
+      store.dispatch("pokedex/setActiveCard", undefined);
     };
     const getSpritesUrls = () => {
       if (activeCard?.value.sprites) {
@@ -59,15 +71,29 @@ export default defineComponent({
           .map((url) => url as string);
       }
     };
-
+    onMounted(() => {
+      window.addEventListener("scroll", handleScroll);
+    });
+    onUnmounted(() => {
+      window.removeEventListener("scroll", handleScroll);
+    });
+    const handleScroll = () => {
+      let element = scrollComponent.value;
+      if (element.getBoundingClientRect().bottom < window.innerHeight) {
+        loadMorePokemons(pokemons.value.next);
+      }
+    };
     return {
       pokemons,
+      pokemonsList,
       urlSvg,
       modalActive,
       pokemonDetails,
       evolutionChain,
+      scrollComponent,
       modalOpen,
       modalClose,
+      loadMorePokemons,
       activeCard,
       spriteUrls,
     };
@@ -81,15 +107,14 @@ export default defineComponent({
 
 <template>
   <div>
-    <div v-if="pokemons" class="row">
+    <div v-if="pokemonsList" class="row" ref="scrollComponent">
       <CardComponent
         @click="modalOpen(pokemon)"
-        v-for="(pokemon, index) in pokemons.results"
+        v-for="(pokemon, index) in pokemonsList"
         :key="index"
         :pokemon="pokemon"
         :urlSvg="urlSvg + pokemon.url.split('/')[6] + '.svg'"
       />
-      {{ console.log(pokemons) }}
     </div>
     <div v-else>Carregando...</div>
   </div>
