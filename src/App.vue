@@ -5,6 +5,7 @@ import CardComponent from "./components/globalComponents/Card/CardComponent.vue"
 import { PokemonDetails, PokemonsResult } from "./types/pokedex";
 import ModalComponent from "./components/globalComponents/Modal/ModalComponent.vue";
 import PokedexService from "./services/pokedex.service";
+import Header from "./components/globalComponents/Header/Header.vue";
 
 export default defineComponent({
   setup() {
@@ -134,7 +135,12 @@ export default defineComponent({
           break;
       }
     };
-
+    function formatNumberToHex(num: number): string {
+      // Adiciona zeros à esquerda até o número ter 4 dígitos
+      const formattedNumber = num.toString().padStart(4, "0");
+      // Retorna a representação hexadecimal do número
+      return `#${formattedNumber}`;
+    }
     return {
       pokemons,
       pokemonsList,
@@ -156,9 +162,11 @@ export default defineComponent({
       pokemonList,
       clearInput,
       imageUrl,
+      formatNumberToHex,
     };
   },
   components: {
+    Header,
     CardComponent,
     ModalComponent,
   },
@@ -166,138 +174,247 @@ export default defineComponent({
 </script>
 
 <template>
-  <div>
-    <div class="input-group mb-3">
-      <button
-        class="btn btn-outline-secondary dropdown-toggle"
-        type="button"
-        data-bs-toggle="dropdown"
-        aria-expanded="false"
-      >
-        {{ filterButtonText }}
-      </button>
-      <ul class="dropdown-menu">
-        <li>
-          <a class="dropdown-item" @click="updateFilter('Name')">Name</a>
-        </li>
-        <li><a class="dropdown-item" @click="updateFilter('ID')">ID</a></li>
-        <li>
-          <a class="dropdown-item" @click="updateFilter('Type')">Type</a>
-        </li>
-        <li>
-          <a class="dropdown-item" @click="updateFilter('Specie')">Specie</a>
-        </li>
-      </ul>
-      <input
-        v-model="searchTerm"
-        type="text"
-        class="form-control"
-        :placeholder="'Search by ' + filterButtonText.toLowerCase()"
-        :aria-label="'Search by ' + filterButtonText.toLowerCase()"
-        aria-describedby="button-addon2"
-        minlength="1"
-      />
-      <button
-        class="btn btn-outline-secondary"
-        type="button"
-        id="button-addon2"
-        @click="clearInput"
-      >
-        X
-      </button>
-      <button
-        class="btn btn-outline-secondary"
-        type="button"
-        id="button-addon2"
-        @click="search"
-        :disabled="searchTerm.length === 0"
-      >
-        Search
-      </button>
-    </div>
-    <div v-if="pokemonsFiltered" class="row" ref="scrollComponent">
-      <CardComponent
-        @click="modalOpen(pokemon)"
-        v-for="(pokemon, index) in pokemonsFiltered"
-        :key="index"
-        :pokemon="pokemon"
-        :urlSvg="urlSvg + (pokemon?.url?.split('/')[6] ?? pokemon?.id) + '.svg'"
-      />
-    </div>
-    <div v-else-if="pokemonsList" class="row" ref="scrollComponent">
-      <CardComponent
-        @click="modalOpen(pokemon)"
-        v-for="(pokemon, index) in pokemonsList"
-        :key="index"
-        :pokemon="pokemon"
-        :urlSvg="urlSvg + pokemon.url.split('/')[6] + '.svg'"
-      />
-    </div>
-    <div v-else>Carregando...</div>
-  </div>
-
-  <ModalComponent
-    v-if="activeCard"
-    @close="modalClose"
-    :modalActive="modalActive"
-    :activeCard="activeCard"
-  >
-    <div>
-      <h1 class="text-capitalize">{{ activeCard.name }}</h1>
-      <img
-        height="150"
-        :src="activeCard?.sprites?.other?.dream_world?.front_default"
-        :alt="activeCard.name"
-      />
-      <div>
-        <h4>Sprites</h4>
-        <img
-          v-for="(url, index) in spriteUrls"
-          :key="index"
-          :src="url"
-          alt=""
+  <div class="px-5">
+    <div
+      class="d-flex flex-column flex-md-row align-items-center justify-content-between py-3"
+    >
+      <Header />
+      <div class="container input-group m-0 h-25">
+        <button
+          class="btn btn-secondary dropdown-toggle"
+          type="button"
+          data-bs-toggle="dropdown"
+          aria-expanded="false"
+        >
+          {{ filterButtonText }}
+        </button>
+        <ul class="dropdown-menu">
+          <li>
+            <a class="dropdown-item" @click="updateFilter('Name')">Name</a>
+          </li>
+          <li><a class="dropdown-item" @click="updateFilter('ID')">ID</a></li>
+          <li>
+            <a class="dropdown-item" @click="updateFilter('Type')">Type</a>
+          </li>
+          <li>
+            <a class="dropdown-item" @click="updateFilter('Specie')">Specie</a>
+          </li>
+        </ul>
+        <input
+          v-model="searchTerm"
+          type="text"
+          class="form-control"
+          :placeholder="'Search by ' + filterButtonText.toLowerCase()"
+          :aria-label="'Search by ' + filterButtonText.toLowerCase()"
+          aria-describedby="button-addon2"
+          minlength="1"
         />
-      </div>
-      <div>
-        <h4>Moves</h4>
-        <div
-          class="d-flex flex-wrap flex-fill gap-2 align-items-center justify-content-center"
+        <button
+          class="btn btn-secondary"
+          type="button"
+          id="button-addon2"
+          @click="clearInput"
         >
-          <span
-            class="text-capitalize"
-            v-for="(move, index) in activeCard.moves"
-            :key="index"
-            >{{ move.move.name }}</span
-          >
-        </div>
-      </div>
-      <div>
-        <h4>Evolution</h4>
-        <span
-          class="text-capitalize"
-          v-for="(evolution, index) in activeCard.evolutions"
-          :key="index"
+          X
+        </button>
+        <button
+          class="btn btn-secondary"
+          type="button"
+          id="button-addon2"
+          @click="search"
+          :disabled="searchTerm.length === 0"
         >
-          {{ evolution }}
-          <span v-if="index < activeCard.evolutions.length - 1"> > </span>
-        </span>
-      </div>
-      <div>
-        <h4>Games</h4>
-        <div
-          class="d-flex flex-wrap flex-fill gap-2 align-items-center justify-content-center"
-        >
-          <span
-            class="text-capitalize"
-            v-for="(gameIndices, index) in activeCard.game_indices"
-            :key="index"
-          >
-            {{ gameIndices.version.name }}
-          </span>
-        </div>
+          Search
+        </button>
       </div>
     </div>
-  </ModalComponent>
+    <div class="mt-4">
+      <div class="container text-center">
+        <div
+          v-if="pokemonsFiltered"
+          class="row row-cols-2 row-cols-lg-5 justify-content-center gap-3"
+          ref="scrollComponent"
+        >
+          <CardComponent
+            @click="modalOpen(pokemon)"
+            v-for="(pokemon, index) in pokemonsFiltered"
+            :key="index"
+            :pokemon="pokemon"
+            :urlSvg="
+              urlSvg + (pokemon?.url?.split('/')[6] ?? pokemon?.id) + '.svg'
+            "
+          />
+        </div>
+        <div
+          v-else-if="pokemonsList"
+          class="row row-cols-3 row-cols-lg-5 justify-content-center gap-3"
+          ref="scrollComponent"
+        >
+          <CardComponent
+            @click="modalOpen(pokemon)"
+            v-for="(pokemon, index) in pokemonsList"
+            :key="index"
+            :pokemon="pokemon"
+            :urlSvg="urlSvg + pokemon.url.split('/')[6] + '.svg'"
+          />
+        </div>
+        <div v-else>Carregando...</div>
+      </div>
+    </div>
+
+    <ModalComponent
+      v-if="activeCard"
+      @close="modalClose"
+      :modalActive="modalActive"
+      :activeCard="activeCard"
+    >
+      <div>
+        <h1 class="text-start text-white fw-bold text-capitalize">
+          {{ activeCard.name }}
+        </h1>
+        <h4 class="text-start text-white fw-bold">
+          {{ formatNumberToHex(activeCard.id) }}
+        </h4>
+        <img
+          height="150"
+          :src="activeCard?.sprites?.other?.dream_world?.front_default"
+          :alt="activeCard.name"
+          class="mb-3"
+        />
+        <!-- Accordion -->
+        <div class="accordion" id="accordionModal">
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed fw-bold"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseOne"
+                aria-expanded="false"
+                aria-controls="collapseOne"
+              >
+                Sprites
+              </button>
+            </h2>
+            <div
+              id="collapseOne"
+              class="accordion-collapse collapse"
+              data-bs-parent="#accordionModal"
+            >
+              <div class="accordion-body">
+                <img
+                  v-for="(url, index) in spriteUrls"
+                  :key="index"
+                  :src="url"
+                  alt=""
+                />
+              </div>
+            </div>
+          </div>
+          <!--  -->
+
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed fw-bold"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseTwo"
+                aria-expanded="false"
+                aria-controls="collapseTwo"
+              >
+                Evolution
+              </button>
+            </h2>
+            <div
+              id="collapseTwo"
+              class="accordion-collapse collapse"
+              data-bs-parent="#accordionModal"
+            >
+              <div class="accordion-body">
+                <span
+                  class="text-capitalize"
+                  v-for="(evolution, index) in activeCard.evolutions"
+                  :key="index"
+                >
+                  {{ evolution }}
+                  <span v-if="index < activeCard.evolutions.length - 1">
+                    >
+                  </span>
+                </span>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed fw-bold"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseThree"
+                aria-expanded="false"
+                aria-controls="collapseThree"
+              >
+                Moves
+              </button>
+            </h2>
+            <div
+              id="collapseThree"
+              class="accordion-collapse collapse"
+              data-bs-parent="#accordionModal"
+            >
+              <div class="accordion-body">
+                <div
+                  class="d-flex flex-wrap flex-fill gap-2 align-items-center justify-content-center"
+                >
+                  <span
+                    class="text-capitalize"
+                    v-for="(move, index) in activeCard.moves"
+                    :key="index"
+                    >{{ move.move.name }}</span
+                  >
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="accordion-item">
+            <h2 class="accordion-header">
+              <button
+                class="accordion-button collapsed fw-bold"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#collapseFour"
+                aria-expanded="false"
+                aria-controls="collapseFour"
+              >
+                Games
+              </button>
+            </h2>
+            <div
+              id="collapseFour"
+              class="accordion-collapse collapse"
+              data-bs-parent="#accordionModal"
+            >
+              <div class="accordion-body">
+                <div
+                  class="d-flex flex-wrap flex-fill gap-2 align-items-center justify-content-center"
+                >
+                  <span
+                    class="text-capitalize"
+                    v-for="(gameIndices, index) in activeCard.game_indices"
+                    :key="index"
+                  >
+                    {{ gameIndices.version.name }}
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- fim -->
+      </div>
+    </ModalComponent>
+  </div>
 </template>
 
 <style scoped>
