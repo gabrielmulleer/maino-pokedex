@@ -61,10 +61,11 @@ button:focus-visible {
 #app {
   max-width: 1980px;
   height: 100%;
+  min-height: 100dvh;
   width: 100dvw;
   margin: 0 auto;
   font-family: "Lato", sans-serif;
-  padding-bottom: 2rem;
+  padding-bottom: 0.1rem;
   text-align: center;
 }
 

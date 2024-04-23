@@ -174,7 +174,10 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="px-5" ref="scrollComponent">
+  <div
+    class="px-sm-5 bg-primary bg-gradient min-dvh-100 h-100"
+    ref="scrollComponent"
+  >
     <div
       class="d-flex flex-column flex-md-row align-items-center justify-content-between py-3"
     >
@@ -424,5 +427,17 @@ export default defineComponent({
 }
 .logo.vue:hover {
   filter: drop-shadow(0 0 2em #42b883aa);
+}
+.dvh-100 {
+  height: 100dvh;
+}
+.min-dvh-100 {
+  min-height: 100dvh;
+}
+@media (min-width: 576px) {
+  .px-sm-0 {
+    padding-left: 3rem;
+    padding-right: 3rem;
+  }
 }
 </style>
