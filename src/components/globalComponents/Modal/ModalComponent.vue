@@ -17,7 +17,7 @@ export default defineComponent({
 <template>
   <div v-show="modalActive" class="modal fade show" style="display: block">
     <div class="modal-dialog modal-dialog-centered">
-      <div class="modal-content">
+      <div class="bg-success bg-gradient modal-content">
         <div class="modal-header">
           <button type="button" class="btn-close" @click="close"></button>
         </div>

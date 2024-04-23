@@ -14,11 +14,17 @@ export default defineComponent({
 });
 </script>
 <template>
-  <div class="card col-6" style="width: 18rem" type="button">
-    <img :src="urlSvg" class="card-img-top" height="100" alt="..." />
+  <div
+    class="px-2 bg-info bg-gradient card col-6"
+    style="width: 11rem"
+    type="button"
+  >
     <div class="card-body">
-      <h5 class="card-title text-capitalize">{{ pokemon.name }}</h5>
+      <h5 class="card-title fw-bold fs-5 text-capitalize">
+        {{ pokemon.name }}
+      </h5>
     </div>
+    <img :src="urlSvg" class="" height="100" alt="..." />
   </div>
 </template>
 
