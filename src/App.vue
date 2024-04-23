@@ -174,7 +174,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="px-5">
+  <div class="px-5" ref="scrollComponent">
     <div
       class="d-flex flex-column flex-md-row align-items-center justify-content-between py-3"
     >
@@ -233,7 +233,6 @@ export default defineComponent({
         <div
           v-if="pokemonsFiltered"
           class="row row-cols-2 row-cols-lg-5 justify-content-center gap-3"
-          ref="scrollComponent"
         >
           <CardComponent
             @click="modalOpen(pokemon)"
@@ -248,7 +247,6 @@ export default defineComponent({
         <div
           v-else-if="pokemonsList"
           class="row row-cols-3 row-cols-lg-5 justify-content-center gap-3"
-          ref="scrollComponent"
         >
           <CardComponent
             @click="modalOpen(pokemon)"
@@ -261,160 +259,157 @@ export default defineComponent({
         <div v-else>Carregando...</div>
       </div>
     </div>
-
-    <ModalComponent
-      v-if="activeCard"
-      @close="modalClose"
-      :modalActive="modalActive"
-      :activeCard="activeCard"
-    >
-      <div>
-        <h1 class="text-start text-white fw-bold text-capitalize">
-          {{ activeCard.name }}
-        </h1>
-        <h4 class="text-start text-white fw-bold">
-          {{ formatNumberToHex(activeCard.id) }}
-        </h4>
-        <img
-          height="150"
-          :src="activeCard?.sprites?.other?.dream_world?.front_default"
-          :alt="activeCard.name"
-          class="mb-3"
-        />
-        <!-- Accordion -->
-        <div class="accordion" id="accordionModal">
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button
-                class="accordion-button collapsed fw-bold"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#collapseOne"
-                aria-expanded="false"
-                aria-controls="collapseOne"
-              >
-                Sprites
-              </button>
-            </h2>
-            <div
-              id="collapseOne"
-              class="accordion-collapse collapse"
-              data-bs-parent="#accordionModal"
+  </div>
+  <ModalComponent
+    v-if="activeCard"
+    @close="modalClose"
+    :modalActive="modalActive"
+    :activeCard="activeCard"
+  >
+    <div>
+      <h1 class="text-start text-white fw-bold text-capitalize">
+        {{ activeCard.name }}
+      </h1>
+      <h4 class="text-start text-white fw-bold">
+        {{ formatNumberToHex(activeCard.id) }}
+      </h4>
+      <img
+        height="150"
+        :src="activeCard?.sprites?.other?.dream_world?.front_default"
+        :alt="activeCard.name"
+        class="mb-3"
+      />
+      <!-- Accordion -->
+      <div class="accordion" id="accordionModal">
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button
+              class="accordion-button collapsed fw-bold"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapseOne"
+              aria-expanded="false"
+              aria-controls="collapseOne"
             >
-              <div class="accordion-body">
-                <img
-                  v-for="(url, index) in spriteUrls"
-                  :key="index"
-                  :src="url"
-                  alt=""
-                />
-              </div>
+              Sprites
+            </button>
+          </h2>
+          <div
+            id="collapseOne"
+            class="accordion-collapse collapse"
+            data-bs-parent="#accordionModal"
+          >
+            <div class="accordion-body">
+              <img
+                v-for="(url, index) in spriteUrls"
+                :key="index"
+                :src="url"
+                alt=""
+              />
             </div>
           </div>
-          <!--  -->
+        </div>
+        <!--  -->
 
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button
-                class="accordion-button collapsed fw-bold"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#collapseTwo"
-                aria-expanded="false"
-                aria-controls="collapseTwo"
-              >
-                Evolution
-              </button>
-            </h2>
-            <div
-              id="collapseTwo"
-              class="accordion-collapse collapse"
-              data-bs-parent="#accordionModal"
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button
+              class="accordion-button collapsed fw-bold"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapseTwo"
+              aria-expanded="false"
+              aria-controls="collapseTwo"
             >
-              <div class="accordion-body">
+              Evolution
+            </button>
+          </h2>
+          <div
+            id="collapseTwo"
+            class="accordion-collapse collapse"
+            data-bs-parent="#accordionModal"
+          >
+            <div class="accordion-body">
+              <span
+                class="text-capitalize"
+                v-for="(evolution, index) in activeCard.evolutions"
+                :key="index"
+              >
+                {{ evolution }}
+                <span v-if="index < activeCard.evolutions.length - 1"> > </span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button
+              class="accordion-button collapsed fw-bold"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapseThree"
+              aria-expanded="false"
+              aria-controls="collapseThree"
+            >
+              Moves
+            </button>
+          </h2>
+          <div
+            id="collapseThree"
+            class="accordion-collapse collapse"
+            data-bs-parent="#accordionModal"
+          >
+            <div class="accordion-body">
+              <div
+                class="d-flex flex-wrap flex-fill gap-2 align-items-center justify-content-center"
+              >
                 <span
                   class="text-capitalize"
-                  v-for="(evolution, index) in activeCard.evolutions"
+                  v-for="(move, index) in activeCard.moves"
                   :key="index"
+                  >{{ move.move.name }}</span
                 >
-                  {{ evolution }}
-                  <span v-if="index < activeCard.evolutions.length - 1">
-                    >
-                  </span>
-                </span>
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button
-                class="accordion-button collapsed fw-bold"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#collapseThree"
-                aria-expanded="false"
-                aria-controls="collapseThree"
-              >
-                Moves
-              </button>
-            </h2>
-            <div
-              id="collapseThree"
-              class="accordion-collapse collapse"
-              data-bs-parent="#accordionModal"
-            >
-              <div class="accordion-body">
-                <div
-                  class="d-flex flex-wrap flex-fill gap-2 align-items-center justify-content-center"
-                >
-                  <span
-                    class="text-capitalize"
-                    v-for="(move, index) in activeCard.moves"
-                    :key="index"
-                    >{{ move.move.name }}</span
-                  >
-                </div>
-              </div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header">
-              <button
-                class="accordion-button collapsed fw-bold"
-                type="button"
-                data-bs-toggle="collapse"
-                data-bs-target="#collapseFour"
-                aria-expanded="false"
-                aria-controls="collapseFour"
-              >
-                Games
-              </button>
-            </h2>
-            <div
-              id="collapseFour"
-              class="accordion-collapse collapse"
-              data-bs-parent="#accordionModal"
-            >
-              <div class="accordion-body">
-                <div
-                  class="d-flex flex-wrap flex-fill gap-2 align-items-center justify-content-center"
-                >
-                  <span
-                    class="text-capitalize"
-                    v-for="(gameIndices, index) in activeCard.game_indices"
-                    :key="index"
-                  >
-                    {{ gameIndices.version.name }}
-                  </span>
-                </div>
               </div>
             </div>
           </div>
         </div>
-        <!-- fim -->
+        <div class="accordion-item">
+          <h2 class="accordion-header">
+            <button
+              class="accordion-button collapsed fw-bold"
+              type="button"
+              data-bs-toggle="collapse"
+              data-bs-target="#collapseFour"
+              aria-expanded="false"
+              aria-controls="collapseFour"
+            >
+              Games
+            </button>
+          </h2>
+          <div
+            id="collapseFour"
+            class="accordion-collapse collapse"
+            data-bs-parent="#accordionModal"
+          >
+            <div class="accordion-body">
+              <div
+                class="d-flex flex-wrap flex-fill gap-2 align-items-center justify-content-center"
+              >
+                <span
+                  class="text-capitalize"
+                  v-for="(gameIndices, index) in activeCard.game_indices"
+                  :key="index"
+                >
+                  {{ gameIndices.version.name }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </ModalComponent>
-  </div>
+      <!-- fim -->
+    </div>
+  </ModalComponent>
 </template>
 
 <style scoped>

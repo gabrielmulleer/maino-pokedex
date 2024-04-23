@@ -64,12 +64,7 @@ button:focus-visible {
   width: 100dvw;
   margin: 0 auto;
   font-family: "Lato", sans-serif;
-  /* --bs-bg-opacity: 1;
-  background-color: rgba(
-    var(--bs-primary-rgb),
-    var(--bs-bg-opacity)
-  ) !important;
-  background-image: var(--bs-gradient); */
+  padding-bottom: 2rem;
   text-align: center;
 }
 
